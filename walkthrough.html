@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sahara — reel</title>
+<style>
+:root{--accent:#14b8a6;--bg:#0a0f0e;--surface:#101918;--raised:#152221;--border:rgba(255,255,255,.08);--text:#eaf3f1;--muted:#86a39d;--faint:#5a716c;--in:#1c2b29;--f:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--f);font-size:14px;-webkit-font-smoothing:antialiased;overflow:hidden}
+.tnum{font-variant-numeric:tabular-nums}
+.wrap{height:100vh;display:grid;grid-template-columns:300px 1fr}
+.list{background:var(--surface);border-right:1px solid var(--border);padding:16px 14px}
+.bhead{display:flex;align-items:center;gap:10px;margin-bottom:18px}.bhead .lg{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:#06231f;font-weight:800}.bhead .nm{font-weight:700;font-size:16px}.bhead .st{font-size:11px;color:var(--accent)}
+.stat{background:var(--raised);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px}.stat .v{font-size:24px;font-weight:800;letter-spacing:-.02em}.stat .l{font-size:12px;color:var(--muted);margin-top:1px}
+.conv{display:flex;align-items:center;gap:11px;padding:11px;border-radius:12px;background:var(--raised);border:1px solid var(--border)}.conv .av{width:36px;height:36px;border-radius:50%;background:#26403c;display:grid;place-items:center;font-weight:700;color:var(--accent)}.conv .cn{font-weight:600;font-size:13.5px}.conv .cl{font-size:12px;color:var(--muted)}
+.chat{display:flex;flex-direction:column}
+.chead{height:62px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 22px}.chead .av{width:38px;height:38px;border-radius:50%;background:#26403c;display:grid;place-items:center;font-weight:700;color:var(--accent)}.chead .nm{font-weight:600}.chead .sub{font-size:12px;color:var(--muted)}
+.chead .toggle{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--accent);font-weight:600}.chead .sw{width:34px;height:19px;border-radius:99px;background:var(--accent);position:relative}.chead .sw::after{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:#06231f;top:2px;right:2px}
+.msgs{flex:1;overflow:auto;padding:24px 26px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,#0b110f,#0a0f0e)}
+.bub{max-width:64%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.45}
+.bub.in{background:var(--in);align-self:flex-start;border-bottom-left-radius:5px}
+.bub.out{background:var(--accent);color:#06231f;align-self:flex-end;border-bottom-right-radius:5px;font-weight:500}
+.bub .tag{display:block;font-size:10.5px;margin-top:5px;opacity:.7;font-weight:600}
+.typing{align-self:flex-start;background:var(--in);border-radius:14px;border-bottom-left-radius:5px;padding:13px 16px;display:flex;gap:4px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tp 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.fade{animation:fade .35s both}@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.cursor{position:fixed;top:0;left:0;width:26px;height:26px;z-index:95;pointer-events:none;opacity:0;transition:transform .85s cubic-bezier(.45,0,.16,1),opacity .35s;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6))}
+</style></head>
+<body>
+<div class="wrap">
+  <aside class="list">
+    <div class="bhead"><div class="lg">S</div><div><div class="nm">سہارا · Sahara</div><div class="st">● AI auto-reply ON</div></div></div>
+    <div class="stat"><div class="v"><span class="tnum" id="cnt">47</span></div><div class="l">Auto-replied today</div></div>
+    <div class="stat"><div class="v">2.3s</div><div class="l">Avg response time</div></div>
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:700;margin:16px 4px 9px">Active chat</div>
+    <div class="conv"><div class="av">A</div><div><div class="cn">+92 3•• ••• ••21</div><div class="cl">Asad · Lahore</div></div></div>
+  </aside>
+  <div class="chat">
+    <div class="chead"><div class="av">A</div><div><div class="nm">Asad</div><div class="sub">customer · WhatsApp</div></div><div class="toggle"><span class="sw"></span> AI replying</div></div>
+    <div class="msgs" id="msgs"></div>
+  </div>
+</div>
+<div class="cursor" id="cur"><svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" stroke="#0a0f0e" stroke-width="1.2" stroke-linejoin="round"><path d="M5 3l14 6.5-6 1.8-1.8 6z"/></svg></div>
+<script>
+const msgs=document.getElementById('msgs');
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function cap(t){try{parent.postMessage({type:'cap',tx:t},'*')}catch(e){}}
+function add(cls,html){const d=document.createElement('div');d.className='bub '+cls+' fade';d.innerHTML=html;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
+async function typing(){const t=document.createElement('div');t.className='typing fade';t.innerHTML='<i></i><i></i><i></i>';msgs.appendChild(t);msgs.scrollTop=msgs.scrollHeight;await wait(1200);t.remove()}
+async function direct(){
+  msgs.innerHTML='';
+  await wait(700);
+  cap('Your customers message on WhatsApp — at every hour.');
+  await wait(2000);
+  add('in',"bhai ye wala kitne ka hai?");
+  await wait(1100);await typing();
+  add('out',`Yeh PKR 2,500 ka hai — free delivery bhi. Abhi order karein?<span class="tag">↳ from your catalog</span>`);
+  document.getElementById('cnt').textContent='48';
+  cap('Sahara answers instantly — in their language, from your catalog.');
+  await wait(2800);
+  add('in',"delivery kitne din me?");
+  await wait(1000);await typing();
+  add('out',"2–3 din, aur cash on delivery available hai. Address bhej dein? 📦");
+  document.getElementById('cnt').textContent='49';
+  cap('Auto-answers FAQs. Escalates only what needs you.');
+  await wait(3200);
+  cap('');await wait(500);try{parent.postMessage({type:'end'},'*')}catch(e){}
+  await wait(2400);direct();
+}
+setTimeout(direct,500);
+</script>
+</body></html>
