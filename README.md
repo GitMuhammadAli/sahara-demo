@@ -22,7 +22,7 @@ An AI agent that answers your customers on WhatsApp — instantly, in their lang
 
 ## 🎬 Demo
 
-https://github.com/user-attachments/assets/c513b181-f39f-461d-840d-f01715746978
+https://github.com/user-attachments/assets/39f079d6-cc65-4cca-8fcc-bf1921d2e65e
 
 > A narrated product film. ▶ Also runs as an interactive film → [`index.html`](./index.html)
 
