@@ -24,7 +24,7 @@ An AI agent that answers your customers on WhatsApp — instantly, in their lang
 
 https://github.com/user-attachments/assets/39f079d6-cc65-4cca-8fcc-bf1921d2e65e
 
-> A narrated product film. ▶ Also runs as an interactive film → [`index.html`](./index.html)
+> A cinematic product promo. ▶ Also runs as an interactive film → [`index.html`](./index.html)
 
 **▶ Live:** **https://sahara-pk.vercel.app**
 
